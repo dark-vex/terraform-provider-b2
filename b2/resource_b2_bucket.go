@@ -89,14 +89,8 @@ func resourceB2Bucket() *schema.Resource {
 				Type:        schema.TypeList,
 				Elem:        getServerSideEncryptionElem(false),
 				Optional:    true,
+				Computed:    true,
 				MaxItems:    1,
-				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-					// The API sets default value
-					if k == "default_server_side_encryption.#" {
-						return old == "1" && new == "0"
-					}
-					return old == "none" && new == ""
-				},
 			},
 			"lifecycle_rules": {
 				Description: "The initial list of lifecycle rules for this bucket.",
@@ -200,14 +194,17 @@ func resourceB2BucketUpdate(ctx context.Context, d *schema.ResourceData, meta in
 	client := meta.(*Client)
 
 	input := BucketInput{
-		BucketId:                    d.Id(),
-		AccountId:                   d.Get("account_id").(string),
-		BucketType:                  d.Get("bucket_type").(string),
-		BucketInfo:                  d.Get("bucket_info").(map[string]interface{}),
-		CorsRules:                   d.Get("cors_rules").([]interface{}),
-		FileLockConfiguration:       d.Get("file_lock_configuration").([]interface{}),
-		DefaultServerSideEncryption: d.Get("default_server_side_encryption").([]interface{}),
-		LifecycleRules:              d.Get("lifecycle_rules").([]interface{}),
+		BucketId:              d.Id(),
+		AccountId:             d.Get("account_id").(string),
+		BucketType:            d.Get("bucket_type").(string),
+		BucketInfo:            d.Get("bucket_info").(map[string]interface{}),
+		CorsRules:             d.Get("cors_rules").([]interface{}),
+		FileLockConfiguration: d.Get("file_lock_configuration").([]interface{}),
+		LifecycleRules:        d.Get("lifecycle_rules").([]interface{}),
+	}
+
+	if d.HasChange("default_server_side_encryption") {
+		input.DefaultServerSideEncryption = d.Get("default_server_side_encryption").([]interface{})
 	}
 
 	var output BucketOutput

@@ -29,7 +29,6 @@ func resourceB2BucketFileVersion() *schema.Resource {
 		CreateContext: resourceB2BucketFileVersionCreate,
 		ReadContext:   resourceB2BucketFileVersionRead,
 		DeleteContext: resourceB2BucketFileVersionDelete,
-
 		Schema: map[string]*schema.Schema{
 			"bucket_id": {
 				Description:  "The ID of the bucket.",
@@ -80,15 +79,9 @@ func resourceB2BucketFileVersion() *schema.Resource {
 				Type:        schema.TypeList,
 				Elem:        getResourceFileEncryptionElem(),
 				Optional:    true,
+				Computed:    true,
 				ForceNew:    true,
 				MaxItems:    1,
-				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-					// The API sets default value
-					if k == "server_side_encryption.#" {
-						return old == "1" && new == "0"
-					}
-					return old == "none" && new == ""
-				},
 			},
 			"action": {
 				Description: "One of 'start', 'upload', 'hide', 'folder', or other values added in the future.",
@@ -135,7 +128,6 @@ func resourceB2BucketFileVersionCreate(ctx context.Context, d *schema.ResourceDa
 		FileInfo:             d.Get("file_info").(map[string]interface{}),
 		ServerSideEncryption: d.Get("server_side_encryption").([]interface{}),
 	}
-
 	var output BucketFileVersionOutput
 	err := client.Apply(ctx, OpResourceCreate, &input, &output)
 	if err != nil {

@@ -58,7 +58,7 @@ Optional:
 Optional:
 
 - `algorithm` (String) Server-side encryption algorithm. AES256 is the only one supported.
-- `mode` (String) Server-side encryption mode.
+- `mode` (String) Server-side encryption mode. SSE-B2 is the only supported bucket default.
 
 
 <a id="nestedblock--file_lock_configuration"></a>

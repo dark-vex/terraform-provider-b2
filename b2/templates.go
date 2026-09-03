@@ -137,15 +137,17 @@ func getResourceFileEncryptionElem() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"mode": {
-				Description:  "Server-side encryption mode.",
+				Description:  "Server-side encryption mode. SSE-B2 and SSE-C are supported.",
 				Type:         schema.TypeString,
 				Optional:     true,
-				ValidateFunc: validation.StringInSlice([]string{"none", "SSE-B2", "SSE-C"}, false),
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"SSE-B2", "SSE-C"}, false),
 			},
 			"algorithm": {
 				Description:  "Server-side encryption algorithm. AES256 is the only one supported.",
 				Type:         schema.TypeString,
 				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"AES256"}, false),
 			},
 			"key": {
@@ -185,16 +187,16 @@ func getServerSideEncryptionElem(ds bool) *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"mode": {
-				Description:  "Server-side encryption mode.",
+				Description:  "Server-side encryption mode. SSE-B2 is the only supported bucket default.",
 				Type:         schema.TypeString,
-				Computed:     If(ds, true, false),
+				Computed:     true,
 				Optional:     If(ds, false, true),
-				ValidateFunc: If(ds, nil, validation.StringInSlice([]string{"none", "SSE-B2"}, false)),
+				ValidateFunc: If(ds, nil, validation.StringInSlice([]string{"SSE-B2"}, false)),
 			},
 			"algorithm": {
 				Description:  "Server-side encryption algorithm. AES256 is the only one supported.",
 				Type:         schema.TypeString,
-				Computed:     If(ds, true, false),
+				Computed:     true,
 				Optional:     If(ds, false, true),
 				ValidateFunc: If(ds, nil, validation.StringInSlice([]string{"AES256"}, false)),
 			},
