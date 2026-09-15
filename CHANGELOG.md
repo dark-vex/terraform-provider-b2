@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-09-15
+
 ### Changed
 * `default_server_side_encryption` on `b2_bucket`: no longer accepts `none`. B2 applies SSE-B2 (AES256) as the default server-side encryption to every bucket, existing ones included; a configuration that still declares `none` must drop the block or set `SSE-B2` before upgrading. When omitted, the server default applies
 * `default_server_side_encryption` on `b2_bucket`: when omitted, the provider no longer sends a value from stored state; previously it silently re-sent the last value read from B2 on every update, with no visible diff in the plan
@@ -21,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Infrastructure
 * Add `make test` target running unit tests and run them in CI
+* Upgrade `google.golang.org/grpc` to v1.83.1
 
 ## [0.13.2] - 2026-07-27
 
@@ -293,7 +296,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 * Implementation of PoC (simple `b2_application_key` data source)
 
-[Unreleased]: https://github.com/Backblaze/terraform-provider-b2/compare/v0.13.2...HEAD
+[Unreleased]: https://github.com/Backblaze/terraform-provider-b2/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/Backblaze/terraform-provider-b2/compare/v0.13.2...v0.14.0
 [0.13.2]: https://github.com/Backblaze/terraform-provider-b2/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/Backblaze/terraform-provider-b2/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/Backblaze/terraform-provider-b2/compare/v0.12.1...v0.13.0
