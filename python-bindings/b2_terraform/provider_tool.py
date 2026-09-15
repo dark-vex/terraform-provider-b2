@@ -331,16 +331,13 @@ class Bucket(Command):
         if default_server_side_encryption:
             mode = default_server_side_encryption[0]['mode'] or None
             if mode:
-                if mode != 'none':
-                    algorithm = apply_or_none(
-                        EncryptionAlgorithm,
-                        default_server_side_encryption[0]['algorithm'] or 'AES256',
-                    )
-                else:
-                    algorithm = None
+                algorithm = apply_or_none(
+                    EncryptionAlgorithm,
+                    default_server_side_encryption[0]['algorithm'] or 'AES256',
+                )
                 default_server_side_encryption = EncryptionSetting(
                     mode=apply_or_none(EncryptionMode, mode),
-                    algorithm=apply_or_none(EncryptionAlgorithm, algorithm),
+                    algorithm=algorithm,
                 )
             else:
                 default_server_side_encryption = None
@@ -443,25 +440,22 @@ class BucketFileVersion(Command):
             mode = server_side_encryption[0]['mode'] or None
             if mode:
                 customer_key = None
-                if mode != 'none':
-                    algorithm = apply_or_none(
-                        EncryptionAlgorithm, server_side_encryption[0]['algorithm'] or 'AES256'
+                algorithm = apply_or_none(
+                    EncryptionAlgorithm, server_side_encryption[0]['algorithm'] or 'AES256'
+                )
+                if mode == 'SSE-C':
+                    key = server_side_encryption[0]['key'][0]
+                    # EncryptionKey only accepts raw bytes as keys, not base 64
+                    customer_key = EncryptionKey(
+                        secret=base64.b64decode(key['secret_b64'], validate=True),
+                        key_id=key.get('key_id'),
                     )
-                    if mode == 'SSE-C':
-                        key = server_side_encryption[0]['key'][0]
-                        # EncryptionKey only accepts raw bytes as keys, not base 64
-                        customer_key = EncryptionKey(
-                            secret=base64.b64decode(key['secret_b64'], validate=True),
-                            key_id=key.get('key_id'),
-                        )
-                        customer_key_size = len(customer_key.secret or b'')
-                        if customer_key_size != 32:
-                            raise RuntimeError(f'Wrong key length ({customer_key_size})')
-                else:
-                    algorithm = None
+                    customer_key_size = len(customer_key.secret or b'')
+                    if customer_key_size != 32:
+                        raise RuntimeError(f'Wrong key length ({customer_key_size})')
                 server_side_encryption = EncryptionSetting(
                     mode=apply_or_none(EncryptionMode, mode),
-                    algorithm=apply_or_none(EncryptionAlgorithm, algorithm),
+                    algorithm=algorithm,
                     key=customer_key,
                 )
             else:

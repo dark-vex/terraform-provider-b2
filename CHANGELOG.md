@@ -6,12 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+* `default_server_side_encryption` on `b2_bucket`: no longer accepts `none`. B2 applies SSE-B2 (AES256) as the default server-side encryption to every bucket, existing ones included; a configuration that still declares `none` must drop the block or set `SSE-B2` before upgrading. When omitted, the server default applies
+* `default_server_side_encryption` on `b2_bucket`: when omitted, the provider no longer sends a value from stored state; previously it silently re-sent the last value read from B2 on every update, with no visible diff in the plan
+* `server_side_encryption` on `b2_bucket_file_version`: no longer accepts `none` (it was never valid); when omitted, the file gets the bucket default
+
 ### Fixed
 * Ignore `bucket_info` key case differences in `b2_bucket` resource, which caused a permanent diff
 * Ignore `file_info` key case differences in `b2_bucket_file_version` resource, which caused the file to be re-uploaded on every apply
 * Stop re-uploading `b2_bucket_file_version` files whose `file_info` gained a key from B2, such as `sse_c_key_id` or `large_file_sha1`
 * Warn when `file_info` in `b2_bucket_file_version` resource sets a key that B2 sets itself, such as `sse_c_key_id` or `large_file_sha1`
 * Stop `b2_bucket` `lifecycle_rules` order diffs caused by B2 not guaranteeing the rule order (a permanent plan and needless `revision` bumps on every apply)
+* `server_side_encryption` on `b2_bucket_file_version`: when omitted, fixed a perpetual plan diff that forced the file to be re-created (re-uploaded) on every apply once the bucket default is SSE-B2
 
 ### Infrastructure
 * Add `make test` target running unit tests and run them in CI
