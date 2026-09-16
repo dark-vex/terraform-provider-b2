@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Infrastructure
 * Add `make test` target running unit tests and run them in CI
 * Upgrade `google.golang.org/grpc` to v1.83.1
+* Build Linux Python bindings on Debian bookworm, as Debian bullseye security packages are no longer available
 
 ## [0.13.2] - 2026-07-27
 

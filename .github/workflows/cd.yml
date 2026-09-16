@@ -38,7 +38,7 @@ jobs:
               --platform linux/arm64 \
               --volume .:/work \
               --name builder \
-              arm64v8/python:${{ env.PYTHON_DEFAULT_VERSION }}-bullseye \
+              arm64v8/python:${{ env.PYTHON_DEFAULT_VERSION }}-bookworm \
               /bin/bash -c "sleep infinity"
       - name: Start a Docker container (linux-amd64)
         if: matrix.conf.os == 'linux' && matrix.conf.arch == 'amd64'
@@ -46,7 +46,7 @@ jobs:
           docker run --detach \
               --volume .:/work \
               --name builder \
-              python:${{ env.PYTHON_DEFAULT_VERSION }}-bullseye \
+              python:${{ env.PYTHON_DEFAULT_VERSION }}-bookworm \
               /bin/bash -c "sleep infinity"
       - name: Set up Python ${{ env.PYTHON_DEFAULT_VERSION }} (darwin, windows)
         if: matrix.conf.os != 'linux'
