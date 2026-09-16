@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.14.0] - 2026-09-15
+## [0.14.0] - 2026-09-16
 
 ### Changed
 * `default_server_side_encryption` on `b2_bucket`: no longer accepts `none`. B2 applies SSE-B2 (AES256) as the default server-side encryption to every bucket, existing ones included; a configuration that still declares `none` must drop the block or set `SSE-B2` before upgrading. When omitted, the server default applies
@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Infrastructure
 * Add `make test` target running unit tests and run them in CI
-* Upgrade `google.golang.org/grpc` to v1.83.1
+* Upgrade `google.golang.org/grpc` to v1.83.2
 * Build Linux Python bindings on Debian bookworm, as Debian bullseye security packages are no longer available
 
 ## [0.13.2] - 2026-07-27
