@@ -23,7 +23,7 @@ jobs:
         conf:
           - { runner: ubuntu-latest, os: linux, arch: amd64 }
           - { runner: ubuntu-latest, os: linux, arch: arm64 }
-          - { runner: macos-14-large, os: darwin, arch: amd64 }
+          - { runner: macos-15-intel, os: darwin, arch: amd64 }
           - { runner: macos-14, os: darwin, arch: arm64 }
           - { runner: windows-2022, os: windows, arch: amd64 }
     outputs:
@@ -101,6 +101,8 @@ jobs:
           retention-days: 1
   build-and-deploy:
     needs: [build-pybindings]
+    permissions:
+      contents: write
     env:
       NOPYBINDINGS: 1  # do not build python bindings
     runs-on: ubuntu-latest
@@ -142,19 +144,11 @@ jobs:
         uses: mindsers/changelog-reader-action@v2
         with:
           version: ${{ steps.version.outputs.version }}
-      - name: Import GPG key
-        id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
       - name: Create GitHub release
         uses: goreleaser/goreleaser-action@v6
         with:
           version: '~> v2'
           args: release --clean -p 1
-        env:
-          GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
       - name: Update GitHub release
         uses: softprops/action-gh-release@v2
         with:
