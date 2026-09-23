@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.0-fix.1] - 2026-09-23
+
 ### Fixed
 * Fetch complete `b2_bucket` metadata when using a bucket-restricted application key, instead of persisting blank bucket type/encryption fields and an invalid file-lock retention value from b2sdk's name/ID cache
 
