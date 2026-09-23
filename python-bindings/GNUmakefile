@@ -7,17 +7,23 @@ STATICX?=1
 
 default: build
 
-.PHONY: deps format lint testacc clean build
+.PHONY: deps deps-test format lint test testacc clean build
 
 deps:
 	@pip install -r requirements-dev.txt
 
+deps-test:
+	@pip install -r requirements.txt
+
 format:
-	@ruff format ${DIR}
+	@ruff format ${DIR} tests
 
 lint:
-	@ruff check ${DIR}
+	@ruff check ${DIR} tests
 	@python ../scripts/check-headers.py '**/*.py'
+
+test:
+	@PYTHONPATH=. python -m unittest discover -s tests -v
 
 testacc: build
 

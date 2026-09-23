@@ -27,7 +27,7 @@ from b2sdk.v3 import (
     EncryptionSetting,
     InMemoryAccountInfo,
 )
-from b2sdk.v3.exception import BadRequest, BucketIdNotFound
+from b2sdk.v3.exception import BadRequest, BucketIdNotFound, NonExistentBucket
 from b2_terraform.arg_parser import ArgumentParser
 from b2_terraform.json_encoder import B2ProviderJsonEncoder
 
@@ -215,7 +215,7 @@ class ApplicationKey(Command):
 class Bucket(Command):
     def data_source_read(self, *, bucket_name, **kwargs):
         config_cors_rules = kwargs.get('cors_rules')
-        bucket = self.api.get_bucket_by_name(bucket_name)
+        bucket = self._get_fresh_bucket(bucket_name=bucket_name)
         return self._postprocess(bucket, config_cors_rules=config_cors_rules)
 
     def resource_create(
@@ -261,7 +261,7 @@ class Bucket(Command):
 
     def resource_read(self, *, bucket_id, **kwargs):
         try:
-            bucket = self.api.get_bucket_by_id(bucket_id)
+            bucket = self._get_fresh_bucket(bucket_id=bucket_id)
         except BucketIdNotFound:
             return None  # no bucket has been found
         return self._postprocess(bucket, config_cors_rules=kwargs.get('cors_rules'))
@@ -290,7 +290,7 @@ class Bucket(Command):
         )
         params.pop('is_file_lock_enabled', None)  # this can only be set during bucket creation
         self.api.session.update_bucket(**params)
-        bucket = self.api.get_bucket_by_id(bucket_id)
+        bucket = self._get_fresh_bucket(bucket_id=bucket_id)
         return self._postprocess(bucket, config_cors_rules=cors_rules)
 
     def resource_delete(self, *, bucket_id, **kwargs):
@@ -302,6 +302,19 @@ class Bucket(Command):
                 pass
             else:
                 raise
+
+    def _get_fresh_bucket(self, *, bucket_id=None, bucket_name=None):
+        """Fetch complete bucket metadata without using b2sdk's name/ID cache."""
+        buckets = self.api.list_buckets(
+            bucket_id=bucket_id,
+            bucket_name=bucket_name,
+            use_cache=False,
+        )
+        if buckets:
+            return buckets[0]
+        if bucket_id is not None:
+            raise BucketIdNotFound(bucket_id)
+        raise NonExistentBucket(bucket_name)
 
     def _preprocess(self, **kwargs):
         cors_rules = kwargs.pop('cors_rules', None)
