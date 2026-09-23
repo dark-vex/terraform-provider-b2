@@ -60,10 +60,16 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
+      - name: Set up Python ${{ env.PYTHON_DEFAULT_VERSION }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_DEFAULT_VERSION }}
       - name: Set up Go ${{ env.GO_DEFAULT_VERSION }}
         uses: actions/setup-go@v6
         with:
           go-version: ${{ env.GO_DEFAULT_VERSION }}
+      - name: Install Python test dependencies
+        run: make -C python-bindings deps-test
       - name: Run unit tests
         run: make test
   build:
